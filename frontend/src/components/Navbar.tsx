@@ -4,8 +4,8 @@ import { getTodayJalali } from '../lib/jalali';
 
 interface NavbarProps {
   currentUser: any;
-  currentView: 'admin' | 'secretary' | 'client';
-  onViewChange: (view: 'admin' | 'secretary' | 'client') => void;
+  currentView: 'admin' | 'secretary' | 'client' | 'bot_sim';
+  onViewChange: (view: 'admin' | 'secretary' | 'client' | 'bot_sim') => void;
   onLogout: () => void;
 }
 
@@ -93,7 +93,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Smartphone className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">وب‌اپ تلگرام (TWA)</span>
-              <span className="sm:hidden">رزرو</span>
+              <span className="sm:hidden">وب‌اپ</span>
+            </button>
+
+            <button
+              onClick={() => onViewChange('bot_sim')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                currentView === 'bot_sim'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-glow-alma'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">ربات دکمه‌ای</span>
+              <span className="sm:hidden">ربات</span>
             </button>
           </nav>
 

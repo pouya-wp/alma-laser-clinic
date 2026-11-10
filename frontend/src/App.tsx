@@ -3,13 +3,14 @@ import { Navbar } from './components/Navbar';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { SecretaryPanel } from './pages/SecretaryPanel';
 import { TelegramBookingApp } from './pages/TelegramBookingApp';
+import { TelegramBotSimulator } from './pages/TelegramBotSimulator';
 import { LoginPage } from './pages/LoginPage';
 import { api } from './lib/api';
 import { User } from './lib/types';
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentView, setCurrentView] = useState<'admin' | 'secretary' | 'client'>('admin');
+  const [currentView, setCurrentView] = useState<'admin' | 'secretary' | 'client' | 'bot_sim'>('admin');
   const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
@@ -97,6 +98,7 @@ export const App: React.FC = () => {
         {currentView === 'admin' && <AdminDashboard />}
         {currentView === 'secretary' && <SecretaryPanel />}
         {currentView === 'client' && <TelegramBookingApp />}
+        {currentView === 'bot_sim' && <TelegramBotSimulator />}
       </main>
     </div>
   );
