@@ -54,11 +54,28 @@ function getBotUpcomingDays(count = 7) {
 
 const AVAILABLE_HOURS = ['10:00', '11:15', '16:00', '17:15', '18:30', '19:45'];
 
+// Helper to edit current message or reply
+async function respondOrEdit(ctx: any, text: string, reply_markup?: any) {
+  try {
+    if (ctx.callbackQuery?.message) {
+      await ctx.editMessageText(text, { reply_markup });
+      return;
+    }
+  } catch (e: any) {
+    // Fall back to reply if message cannot be edited
+  }
+  await ctx.reply(text, { reply_markup });
+}
+
 export function setupTelegramBot() {
   if (!bot) {
     console.warn('⚠️ TELEGRAM_BOT_TOKEN is not set or empty. Bot is running in offline/API simulation mode.');
     return;
   }
+
+  bot.catch((err) => {
+    console.error('⚠️ GrammY Bot Error caught:', err.message);
+  });
 
   // /start command
   bot.command('start', async (ctx) => {
@@ -233,19 +250,19 @@ export function setupTelegramBot() {
 
   // Step 1: Start booking -> Select Gender
   bot.callbackQuery('book_direct', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const kb = new InlineKeyboard()
       .text('🌸 خدمات بانوان', 'book_gender_female')
       .text('⚡ خدمات آقایان', 'book_gender_male')
       .row()
       .text('🔙 بازگشت به منوی اصلی', 'back_to_menu');
 
-    await ctx.reply('لطفاً جنسیت متقاضی نوبت را انتخاب نمایید:', { reply_markup: kb });
+    await respondOrEdit(ctx, 'لطفاً جنسیت متقاضی نوبت را انتخاب نمایید:', kb);
   });
 
   // Step 2: Gender selected -> Select Package
   bot.callbackQuery(/book_gender_(female|male)/, async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const gender = ctx.match[1] === 'female' ? 'FEMALE' : 'MALE';
     const packages = await prisma.servicePackage.findMany({
       where: {
@@ -261,12 +278,12 @@ export function setupTelegramBot() {
     kb.text('🔙 بازگشت', 'book_direct');
 
     const title = gender === 'FEMALE' ? '🌸 پکیج‌های لیزر بانوان (کندلا ۲۰۲۴):' : '⚡ پکیج‌های لیزر آقایان:';
-    await ctx.reply(title, { reply_markup: kb });
+    await respondOrEdit(ctx, title, kb);
   });
 
   // Step 3: Package selected -> Select Date
   bot.callbackQuery(/book_pkg_(.+)/, async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const pkgId = ctx.match[1];
     const pkg = await prisma.servicePackage.findUnique({ where: { id: pkgId } });
     if (!pkg) return ctx.reply('پکیج یافت نشد.');
@@ -279,17 +296,18 @@ export function setupTelegramBot() {
     }
     kb.text('🔙 انتخاب مجدد پکیج', 'book_direct');
 
-    await ctx.reply(
+    await respondOrEdit(
+      ctx,
       `پکیج انتخابی: «${pkg.name}»\n` +
       `تعرفه: ${pkg.price.toLocaleString('fa-IR')} تومان\n\n` +
       `لطفاً تاریخ مراجعه مورد نظر خود را انتخاب نمایید:`,
-      { reply_markup: kb }
+      kb
     );
   });
 
   // Step 4: Date selected -> Select Time Slot
   bot.callbackQuery(/book_date_(.+)_(.+)/, async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const pkgId = ctx.match[1];
     const dateStr = ctx.match[2];
 
@@ -305,14 +323,16 @@ export function setupTelegramBot() {
     }
     kb.text('🔙 تغییر تاریخ', `book_pkg_${pkgId}`);
 
-    await ctx.reply(`تاریخ انتخابی: ${dateStr}\nلطفاً ساعت مراجعه را تعیین فرمایید:`, {
-      reply_markup: kb,
-    });
+    await respondOrEdit(
+      ctx,
+      `تاریخ انتخابی: ${dateStr}\nلطفاً ساعت مراجعه را تعیین فرمایید:`,
+      kb
+    );
   });
 
   // Step 5: Time selected -> Review & Confirm
   bot.callbackQuery(/book_time_(.+)_(.+)_(.+)/, async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const pkgId = ctx.match[1];
     const dateStr = ctx.match[2];
     const timeSlot = ctx.match[3];
@@ -341,12 +361,12 @@ export function setupTelegramBot() {
       .row()
       .text('❌ انصراف و بازگشت', 'back_to_menu');
 
-    await ctx.reply(summaryText, { reply_markup: kb });
+    await respondOrEdit(ctx, summaryText, kb);
   });
 
   // Step 6: Final Confirmation Callback
   bot.callbackQuery(/confirm_booking_(.+)_(.+)_(.+)/, async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const pkgId = ctx.match[1];
     const dateStr = ctx.match[2];
     const timeSlot = ctx.match[3];
@@ -416,7 +436,7 @@ export function setupTelegramBot() {
 
   // View My Appointments via Buttons
   bot.callbackQuery('my_appointments', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const telegramId = BigInt(ctx.from.id);
     const client = await prisma.client.findUnique({
       where: { telegramId },
@@ -434,7 +454,7 @@ export function setupTelegramBot() {
         .text('🗓 رزرو نوبت جدید', 'book_direct')
         .row()
         .text('🏠 بازگشت به منو', 'back_to_menu');
-      return ctx.reply('شما در حال حاضر نوبت ثبت‌شده‌ای ندارید.', { reply_markup: kb });
+      return respondOrEdit(ctx, 'شما در حال حاضر نوبت ثبت‌شده‌ای ندارید.', kb);
     }
 
     let text = `📋 فهرست نوبت‌های شما در کلینیک آلما:\n\n`;
@@ -455,12 +475,12 @@ export function setupTelegramBot() {
     kb.text('🗓 رزرو نوبت جدید', 'book_direct').row();
     kb.text('🏠 بازگشت به منوی اصلی', 'back_to_menu');
 
-    await ctx.reply(text, { reply_markup: kb });
+    await respondOrEdit(ctx, text, kb);
   });
 
   // Cancel Appointment Callback
   bot.callbackQuery(/cancel_appt_(.+)/, async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const apptId = ctx.match[1];
     try {
       await prisma.appointment.update({
@@ -468,7 +488,7 @@ export function setupTelegramBot() {
         data: { status: 'CANCELLED' },
       });
       const kb = new InlineKeyboard().text('🏠 بازگشت به منوی اصلی', 'back_to_menu');
-      await ctx.reply('نوبت مورد نظر با موفقیت لغو شد. در صورت تمایل می‌توانید در زمان دیگری نوبت جدید رزرو فرمایید.', { reply_markup: kb });
+      await respondOrEdit(ctx, 'نوبت مورد نظر با موفقیت لغو شد. در صورت تمایل می‌توانید در زمان دیگری نوبت جدید رزرو فرمایید.', kb);
     } catch (e) {
       await ctx.reply('خطا در لغو نوبت.');
     }
@@ -476,7 +496,7 @@ export function setupTelegramBot() {
 
   // View Profile Callback
   bot.callbackQuery('my_profile', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const telegramId = BigInt(ctx.from.id);
     const client = await prisma.client.findUnique({
       where: { telegramId },
@@ -489,12 +509,12 @@ export function setupTelegramBot() {
       },
     });
     if (!client) return ctx.reply('ابتدا شماره خود را تایید کنید.');
-    return showRegisteredUserDashboard(ctx, client);
+    return showRegisteredUserDashboard(ctx, client, true);
   });
 
   // Price list with direct booking buttons
   bot.callbackQuery('view_prices', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const packages = await prisma.servicePackage.findMany({
       where: { isActive: true },
       orderBy: { price: 'desc' },
@@ -511,16 +531,16 @@ export function setupTelegramBot() {
     const kb = new InlineKeyboard()
       .text('🗓 رزرو مستقیم پکیج‌ها با دکمه', 'book_direct')
       .row()
-      .webApp('📱 یا مشاهده ۳ بعدی در وب‌اپلیکیشن', config.webAppUrl)
+      .webApp('📱 یا مشاهده در وب‌اپلیکیشن', config.webAppUrl)
       .row()
       .text('🏠 منوی اصلی', 'back_to_menu');
 
-    await ctx.reply(msg, { reply_markup: kb });
+    await respondOrEdit(ctx, msg, kb);
   });
 
   // Care guide callback
   bot.callbackQuery('care_guide', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const guideText =
       `📋 راهنمای جامع مراقبت‌های قبل و بعد لیزر آلما 📋\n\n` +
       `🌸 قبل از لیزر:\n` +
@@ -539,12 +559,12 @@ export function setupTelegramBot() {
       .row()
       .text('🏠 منوی اصلی', 'back_to_menu');
 
-    await ctx.reply(guideText, { reply_markup: kb });
+    await respondOrEdit(ctx, guideText, kb);
   });
 
   // Clinic location callback
   bot.callbackQuery('clinic_location', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const lat = 31.9056;
     const lon = 54.3412;
 
@@ -570,33 +590,32 @@ export function setupTelegramBot() {
 
   // Contact secretary callback
   bot.callbackQuery('contact_secretary', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const kb = new InlineKeyboard()
       .text('🗓 رزرو مستقیم نوبت', 'book_direct')
       .row()
       .text('🏠 منوی اصلی', 'back_to_menu');
 
-    await ctx.reply(
+    await respondOrEdit(
+      ctx,
       `📞 ارتباط مستقیم با پذیرش کلینیک آلما:\n\n` +
       `☎️ تلفن ثابت: ۰۳۵-۳۸۲۶۰۰۰۰\n` +
       `📱 شماره همراه و واتساپ منشی: ۰۹۱۳۱۵۱۰۰۰۰\n` +
       `💬 آیدی پاسخگویی تلگرام: @AlmaClinicAdmin\n\n` +
       `همکاران ما در ساعات کاری کلینیک مشتاقانه پاسخگوی شما عزیزان هستند.`,
-      { reply_markup: kb }
+      kb
     );
   });
 
   // Back to Menu Callback
   bot.callbackQuery('back_to_menu', async (ctx) => {
-    await ctx.answerCallbackQuery();
+    ctx.answerCallbackQuery().catch(() => {});
     const telegramId = BigInt(ctx.from.id);
     const client = await prisma.client.findUnique({
       where: { telegramId },
       include: {
         appointments: {
-          where: {
-            status: { in: ['CONFIRMED', 'WAITING', 'IN_PROGRESS', 'PENDING'] },
-          },
+          where: { status: { in: ['CONFIRMED', 'WAITING', 'IN_PROGRESS', 'PENDING'] } },
           include: { package: true, operator: true },
           orderBy: { appointmentDate: 'asc' },
           take: 1,
@@ -604,7 +623,7 @@ export function setupTelegramBot() {
       },
     });
     if (client) {
-      return showRegisteredUserDashboard(ctx, client);
+      return showRegisteredUserDashboard(ctx, client, true);
     }
   });
 
@@ -619,7 +638,7 @@ export function setupTelegramBot() {
 }
 
 // Helper to render user dashboard with both Button & WebApp options
-async function showRegisteredUserDashboard(ctx: any, client: any) {
+async function showRegisteredUserDashboard(ctx: any, client: any, isEdit = false) {
   const upcoming = client.appointments?.[0];
   let upcomingText = '🔸 در حال حاضر نوبت رزرو شده‌ای ندارید.';
   if (upcoming) {
@@ -645,7 +664,7 @@ async function showRegisteredUserDashboard(ctx: any, client: any) {
   const keyboard = new InlineKeyboard()
     .text('🗓 رزرو نوبت مستقیم (با دکمه‌های بات)', 'book_direct')
     .row()
-    .webApp('🚀 یا باز کردن وب‌اپلیکیشن ۳ بعدی (TWA)', webAppLaunchUrl)
+    .webApp('🚀 یا باز کردن وب‌اپلیکیشن (TWA)', webAppLaunchUrl)
     .row()
     .text('📋 سوابق نوبت‌های من', 'my_appointments')
     .text('💎 تعرفه پکیج‌ها', 'view_prices')
@@ -654,6 +673,13 @@ async function showRegisteredUserDashboard(ctx: any, client: any) {
     .text('📍 لوکیشن کلینیک یزد', 'clinic_location')
     .row()
     .text('📞 تماس با منشی', 'contact_secretary');
+
+  if (isEdit && ctx.callbackQuery?.message) {
+    try {
+      await ctx.editMessageText(message, { reply_markup: keyboard });
+      return;
+    } catch (e) {}
+  }
 
   await ctx.reply(message, {
     reply_markup: keyboard,
