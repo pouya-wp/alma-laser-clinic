@@ -129,14 +129,13 @@ export const TelegramBookingApp: React.FC = () => {
   return (
     <div className="max-w-xl mx-auto px-4 py-5 pb-20">
       {/* Top Brand Banner */}
-      <div className="relative overflow-hidden rounded-3xl glass-panel p-5 border border-alma-500/30 mb-5">
-        <div className="absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-alma-500/20 to-transparent rounded-full blur-2xl"></div>
-        <div className="relative flex items-center justify-between">
+      <div className="rounded-3xl glass-panel p-5 border border-white/10 mb-5">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
               src="/logo/org.png"
               alt="Alma Clinic Logo"
-              className="w-12 h-12 object-contain drop-shadow"
+              className="w-12 h-12 object-contain"
             />
             <div>
               <div className="flex items-center gap-1.5">
@@ -364,7 +363,7 @@ export const TelegramBookingApp: React.FC = () => {
             <img
               src="/logo/org.png"
               alt="Alma Logo"
-              className="w-16 h-16 object-contain mx-auto drop-shadow"
+              className="w-16 h-16 object-contain mx-auto"
             />
             <h3 className="text-base font-extrabold text-white">کلینیک تخصصی لیزر آلما یزد</h3>
             <p className="text-xs text-slate-400">

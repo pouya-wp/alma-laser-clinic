@@ -23,12 +23,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         
         {/* Brand & Logo */}
         <div className="flex items-center gap-3">
-          <div className="relative group cursor-pointer" onClick={() => onViewChange('admin')}>
-            <div className="absolute -inset-1 bg-gradient-to-r from-alma-500 to-amber-400 rounded-full blur-sm opacity-70 group-hover:opacity-100 transition duration-300"></div>
+          <div className="cursor-pointer" onClick={() => onViewChange('admin')}>
             <img
               src="/logo/org.png"
               alt="Alma Clinic Logo"
-              className="relative w-10 h-10 object-contain drop-shadow"
+              className="w-10 h-10 object-contain"
             />
           </div>
           <div>

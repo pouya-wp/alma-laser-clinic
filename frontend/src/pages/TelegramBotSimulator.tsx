@@ -394,7 +394,7 @@ export const TelegramBotSimulator: React.FC = () => {
               <img
                 src="/logo/org.png"
                 alt="Bot Logo"
-                className="w-10 h-10 rounded-full object-contain bg-obsidian-900 border border-alma-500/40 p-1"
+                className="w-10 h-10 object-contain"
               />
               <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full absolute bottom-0 right-0 border-2 border-[#17212b]"></span>
             </div>

@@ -52,12 +52,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onSkipToCl
       <div className="relative w-full max-w-md glass-panel rounded-3xl p-8 border border-alma-500/30 shadow-2xl space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="relative inline-block">
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-alma-500 to-amber-400 rounded-full blur-md opacity-80"></div>
+          <div className="inline-block">
             <img
               src="/logo/org.png"
               alt="Alma Clinic Logo"
-              className="relative w-16 h-16 object-contain mx-auto drop-shadow-xl"
+              className="w-16 h-16 object-contain mx-auto"
             />
           </div>
           <h1 className="text-xl font-black text-white">سامانه هوشمند کلینیک لیزر آلما</h1>
