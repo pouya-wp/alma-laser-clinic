@@ -12,7 +12,9 @@ services:
       - DATABASE_URL=file:/app/prisma/alma_clinic.db
       - JWT_SECRET=${JWT_SECRET:-alma_super_secret_yazd_2026}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
-      - TELEGRAM_WEBAPP_URL=${TELEGRAM_WEBAPP_URL:-http://localhost:8090/book}
+      - TELEGRAM_API_ROOT=${TELEGRAM_API_ROOT:-}
+      - TELEGRAM_PROXY=${TELEGRAM_PROXY:-}
+      - TELEGRAM_WEBAPP_URL=${TELEGRAM_WEBAPP_URL:-https://95.38.191.245.sslip.io/book}
       - CLINIC_NAME=${CLINIC_NAME:-کلینیک لیزر آلما}
       - CLINIC_CITY=${CLINIC_CITY:-یزد}
       - CLINIC_PHONE=${CLINIC_PHONE:-03538260000}
