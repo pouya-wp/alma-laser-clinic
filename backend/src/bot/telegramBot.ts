@@ -2,8 +2,31 @@ import { Bot, Keyboard, InlineKeyboard } from 'grammy';
 import { prisma } from '../prisma.js';
 import { config, normalizePhone } from '../config/index.js';
 import jalaali from 'jalaali-js';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { SocksProxyAgent } from 'socks-proxy-agent';
 
-export const bot = config.botToken ? new Bot(config.botToken) : null;
+function createBotInstance(): Bot | null {
+  if (!config.botToken) return null;
+
+  const clientConfig: any = {};
+  if (config.telegramApiRoot) {
+    console.log(`🌐 Using Custom Telegram API Root: ${config.telegramApiRoot}`);
+    clientConfig.apiRoot = config.telegramApiRoot;
+  }
+
+  if (config.telegramProxy) {
+    console.log(`🛡️ Using Telegram Outbound Proxy: ${config.telegramProxy}`);
+    const isSocks = config.telegramProxy.startsWith('socks');
+    const agent = isSocks
+      ? new SocksProxyAgent(config.telegramProxy)
+      : new HttpsProxyAgent(config.telegramProxy);
+    clientConfig.baseFetchConfig = { agent };
+  }
+
+  return new Bot(config.botToken, { client: clientConfig });
+}
+
+export const bot = createBotInstance();
 
 // Helper to get Shamsi upcoming days
 function getBotUpcomingDays(count = 7) {
@@ -525,7 +548,11 @@ export function setupTelegramBot() {
     const lat = 31.9056;
     const lon = 54.3412;
 
-    await ctx.replyLocation(lat, lon);
+    try {
+      await ctx.replyWithLocation(lat, lon);
+    } catch (e) {
+      // location fallback if client doesn't support maps
+    }
     const kb = new InlineKeyboard()
       .text('📞 تماس با منشی', 'contact_secretary')
       .row()

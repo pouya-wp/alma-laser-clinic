@@ -5,6 +5,8 @@ export const config = {
   port: parseInt(process.env.PORT || '4000', 10),
   jwtSecret: process.env.JWT_SECRET || 'alma_laser_secret_2026',
   botToken: process.env.TELEGRAM_BOT_TOKEN || '',
+  telegramApiRoot: process.env.TELEGRAM_API_ROOT || '',
+  telegramProxy: process.env.TELEGRAM_PROXY || process.env.HTTPS_PROXY || process.env.ALL_PROXY || '',
   webAppUrl: process.env.TELEGRAM_WEBAPP_URL || 'http://localhost:5173/book',
   clinicName: process.env.CLINIC_NAME || 'کلینیک لیزر آلما',
   clinicCity: process.env.CLINIC_CITY || 'یزد',
