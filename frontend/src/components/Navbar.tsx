@@ -53,63 +53,67 @@ export const Navbar: React.FC<NavbarProps> = ({
           </span>
         </div>
 
-        {/* View Switcher / Quick Navigation Tabs */}
-        <div className="flex items-center gap-2">
-          <nav className="flex items-center gap-1 bg-obsidian-900/90 p-1 rounded-xl border border-white/10">
-            <button
-              onClick={() => onViewChange('admin')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                currentView === 'admin'
-                  ? 'bg-gradient-to-r from-alma-600 to-alma-500 text-white shadow-glow-alma'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Shield className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">مدیریت کل (PWA)</span>
-              <span className="sm:hidden">ادمین</span>
-            </button>
+        {/* View Switcher / Quick Navigation Tabs - Strictly for Authenticated Staff */}
+        {currentUser && (
+          <div className="flex items-center gap-2">
+            <nav className="flex items-center gap-1 bg-obsidian-900/90 p-1 rounded-xl border border-white/10">
+              {currentUser.role === 'SUPER_ADMIN' && (
+                <button
+                  onClick={() => onViewChange('admin')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                    currentView === 'admin'
+                      ? 'bg-gradient-to-r from-alma-600 to-alma-500 text-white shadow-glow-alma'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">مدیریت کل (PWA)</span>
+                  <span className="sm:hidden">ادمین</span>
+                </button>
+              )}
 
-            <button
-              onClick={() => onViewChange('secretary')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                currentView === 'secretary'
-                  ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-glow-gold'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <UserCheck className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">میز منشی</span>
-              <span className="sm:hidden">منشی</span>
-            </button>
+              {(currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'SECRETARY') && (
+                <button
+                  onClick={() => onViewChange('secretary')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                    currentView === 'secretary'
+                      ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-glow-gold'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <UserCheck className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">میز منشی</span>
+                  <span className="sm:hidden">منشی</span>
+                </button>
+              )}
 
-            <button
-              onClick={() => onViewChange('client')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                currentView === 'client'
-                  ? 'bg-gradient-to-r from-cyan-600 to-blue-500 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">وب‌اپ تلگرام (TWA)</span>
-              <span className="sm:hidden">وب‌اپ</span>
-            </button>
+              <button
+                onClick={() => onViewChange('client')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  currentView === 'client'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-500 text-white'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">پیش‌نمایش وب‌اپ</span>
+                <span className="sm:hidden">وب‌اپ</span>
+              </button>
 
-            <button
-              onClick={() => onViewChange('bot_sim')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                currentView === 'bot_sim'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-glow-alma'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">ربات دکمه‌ای</span>
-              <span className="sm:hidden">ربات</span>
-            </button>
-          </nav>
+              <button
+                onClick={() => onViewChange('bot_sim')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  currentView === 'bot_sim'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-glow-alma'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">شبیه‌ساز ربات</span>
+                <span className="sm:hidden">ربات</span>
+              </button>
+            </nav>
 
-          {currentUser && (
             <div className="flex items-center gap-1.5">
               <a
                 href="/Alma-Secretary-v1.0.0.apk"
@@ -128,8 +132,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
       </div>
     </header>

@@ -627,14 +627,32 @@ export function setupTelegramBot() {
     }
   });
 
-  // Start bot polling
-  bot.start({
-    onStart(botInfo) {
-      console.log(`🤖 Telegram Bot started successfully as @${botInfo.username}`);
-    },
-  }).catch((err) => {
-    console.error('Bot launch failed:', err.message);
-  });
+  // Start resilient bot polling loop with auto-reconnect
+  (async () => {
+    try {
+      await bot.api.deleteWebhook();
+      console.log('🧹 Telegram webhook cleared for long polling.');
+    } catch (e: any) {
+      console.warn('⚠️ deleteWebhook warning:', e.message);
+    }
+
+    let isRunning = true;
+    while (isRunning) {
+      try {
+        console.log('🤖 Starting Telegram Bot polling loop...');
+        await bot.start({
+          drop_pending_updates: false,
+          onStart(botInfo) {
+            console.log(`🤖 Telegram Bot polling active as @${botInfo.username}`);
+          },
+        });
+      } catch (err: any) {
+        console.error('⚠️ Telegram Bot polling error/conflict:', err.message);
+        console.log('⏳ Reconnecting in 3 seconds...');
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    }
+  })().catch(console.error);
 }
 
 // Helper to render user dashboard with both Button & WebApp options

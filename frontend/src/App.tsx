@@ -57,16 +57,10 @@ export const App: React.FC = () => {
     );
   }
 
-  // If in client webapp mode (for Telegram), render without login barrier
+  // If in client webapp mode (for Telegram), render full-screen client app with NO navbar/admin access
   if (currentView === 'client' && !currentUser) {
     return (
-      <div className="min-h-screen bg-obsidian-950">
-        <Navbar
-          currentUser={currentUser}
-          currentView={currentView}
-          onViewChange={setCurrentView}
-          onLogout={handleLogout}
-        />
+      <div className="min-h-screen bg-obsidian-950 text-slate-100">
         <main>
           <TelegramBookingApp />
         </main>
