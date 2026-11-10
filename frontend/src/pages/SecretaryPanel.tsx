@@ -17,6 +17,8 @@ import {
   Upload,
   UserCheck,
   ChevronLeft,
+  Smartphone,
+  Download,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { Appointment, Client, ServicePackage, Operator, LaserDevice } from '../lib/types';
@@ -213,7 +215,17 @@ export const SecretaryPanel: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <a
+            href="/Alma-Secretary-v1.0.0.apk"
+            download="Alma-Secretary-v1.0.0.apk"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30 transition shadow-sm"
+            title="دانلود فایل نصبی اپلیکیشن اختصاصی اندروید منشی (APK)"
+          >
+            <Smartphone className="w-4 h-4 text-emerald-400" />
+            <span className="hidden sm:inline">دانلود اپ اندروید منشی</span>
+            <span className="sm:hidden">اپ اندروید</span>
+          </a>
           <button
             onClick={() => setShowNewClientModal(true)}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-obsidian-900 hover:bg-obsidian-850 text-slate-200 text-xs font-bold border border-white/10 transition"

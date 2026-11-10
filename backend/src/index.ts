@@ -28,14 +28,16 @@ app.use('/static/logo', express.static(path.join(__dirname, '../../Logo')));
 app.use('/api', apiRouter);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+const healthHandler = (req: express.Request, res: express.Response) => {
   res.json({
     status: 'online',
     clinic: config.clinicName,
     city: config.clinicCity,
     time: new Date().toISOString(),
   });
-});
+};
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // Start Server
 app.listen(config.port, '0.0.0.0', () => {

@@ -110,13 +110,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {currentUser && (
-            <button
-              onClick={onLogout}
-              title="خروج از حساب"
-              className="p-2 rounded-xl bg-obsidian-900/90 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 transition"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              <a
+                href="/Alma-Secretary-v1.0.0.apk"
+                download="Alma-Secretary-v1.0.0.apk"
+                title="دانلود اپ اندروید منشی (APK)"
+                className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-xs font-semibold transition"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>دانلود اپ منشی</span>
+              </a>
+              <button
+                onClick={onLogout}
+                title="خروج از حساب"
+                className="p-2 rounded-xl bg-obsidian-900/90 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 transition"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           )}
         </div>
 
