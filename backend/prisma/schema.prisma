@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("SECRETARY") // SUPER_ADMIN, SECRETARY, OPERATOR
+  name         String
+  phone        String?
+  avatar       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Client {
+  id                String        @id @default(uuid())
+  telegramId        BigInt?       @unique
+  telegramUsername  String?
+  firstName         String
+  lastName          String
+  phone             String        @unique
+  gender            String        @default("FEMALE") // FEMALE, MALE
+  nationalCode      String?
+  birthDate         String?       // Jalali e.g. 1375/04/12
+  skinType          String?       // Type 1 - Type 6 (Fitzpatrick)
+  contraindications String?       // Notes on medication, pregnancy, sun exposure
+  notes             String?
+  totalSessions     Int           @default(0)
+  loyaltyPoints     Int           @default(100)
+  appointments      Appointment[]
+  reminders         ReminderLog[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model ServicePackage {
+  id              String        @id @default(uuid())
+  name            String
+  category        String        @default("FULL_BODY") // FULL_BODY, FUNCTIONAL, FACE, UPPER_BODY, LOWER_BODY, SPECIAL
+  gender          String        @default("FEMALE")    // FEMALE, MALE, UNISEX
+  durationMinutes Int           @default(45)
+  price           Int           // Tomans
+  description     String?
+  isActive        Boolean       @default(true)
+  appointments    Appointment[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model LaserDevice {
+  id              String        @id @default(uuid())
+  name            String        // e.g. Candela GentleLase Pro-U 2024, Alma Soprano Titanium
+  model           String?
+  shotCount       Int           @default(0)
+  status          String        @default("ACTIVE") // ACTIVE, MAINTENANCE
+  notes           String?
+  appointments    Appointment[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Operator {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String?
+  colorTag     String?       @default("#EC268F")
+  isActive     Boolean       @default(true)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Appointment {
+  id                 String          @id @default(uuid())
+  clientId           String
+  client             Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  packageId          String
+  package            ServicePackage  @relation(fields: [packageId], references: [id])
+  operatorId         String?
+  operator           Operator?       @relation(fields: [operatorId], references: [id])
+  deviceId           String?
+  device             LaserDevice?    @relation(fields: [deviceId], references: [id])
+  
+  appointmentDate    DateTime        // Standard ISO date
+  shamsiDate         String          // e.g. 1405/08/25
+  timeSlot           String          // e.g. 16:30
+  status             String          @default("CONFIRMED") // PENDING, CONFIRMED, WAITING, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW
+  
+  price              Int
+  discountAmount     Int             @default(0)
+  finalPrice         Int
+  paidAmount         Int             @default(0)
+  paymentMethod      String?         // POS, CASH, CARD_TO_CARD
+  notes              String?
+  
+  reminderSent24h    Boolean         @default(false)
+  reminderSent2h     Boolean         @default(false)
+  postCareSent       Boolean         @default(false)
+  nextSessionDueSent Boolean         @default(false)
+  
+  reminders          ReminderLog[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+}
+
+model ReminderLog {
+  id            String       @id @default(uuid())
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  clientId      String
+  client        Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  reminderType  String       // PRE_24H, PRE_2H, POST_CARE, NEXT_SESSION_INTERVAL, BROADCAST
+  status        String       @default("SENT") // PENDING, SENT, FAILED
+  channel       String       @default("TELEGRAM") // TELEGRAM, SMS
+  messageText   String
+  sentAt        DateTime     @default(now())
+}
+
+model ClinicSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

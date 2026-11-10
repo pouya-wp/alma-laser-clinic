@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: alma_backend
+    restart: unless-stopped
+    environment:
+      - PORT=4000
+      - DATABASE_URL=file:/app/prisma/alma_clinic.db
+      - JWT_SECRET=${JWT_SECRET:-alma_super_secret_yazd_2026}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_WEBAPP_URL=${TELEGRAM_WEBAPP_URL:-http://localhost:8090/book}
+      - CLINIC_NAME=${CLINIC_NAME:-کلینیک لیزر آلما}
+      - CLINIC_CITY=${CLINIC_CITY:-یزد}
+      - CLINIC_PHONE=${CLINIC_PHONE:-03538260000}
+      - CLINIC_ADDRESS=${CLINIC_ADDRESS:-یزد، بلوار جمهوری، نبش کوچه یاسمن، ساختمان سپهر، طبقه ۳}
+      - NODE_ENV=production
+    volumes:
+      - alma_data:/app/prisma
+    networks:
+      - alma-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: alma_frontend
+    restart: unless-stopped
+    ports:
+      - "${ALMA_PORT:-8090}:80"
+    depends_on:
+      - backend
+    networks:
+      - alma-network
+
+volumes:
+  alma_data:
+    name: alma_clinic_data
+
+networks:
+  alma-network:
+    name: alma_clinic_network
+    driver: bridge

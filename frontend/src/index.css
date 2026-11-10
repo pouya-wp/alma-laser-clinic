@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #070a10;
+  color: #f8fafc;
+  font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Luxury Persian Font for Numbers */
+.persian-num {
+  font-feature-settings: "ss01";
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(22, 31, 51, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(236, 38, 143, 0.15);
+}
+
+.glass-card-gold {
+  background: rgba(28, 25, 23, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+/* Safe area support for iOS Notch and Home indicator */
+.safe-padding-top {
+  padding-top: max(env(safe-area-inset-top), 1rem);
+}
+
+.safe-padding-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 1.25rem);
+}
+
+/* Glow effects */
+.glow-alma-sm {
+  box-shadow: 0 0 15px rgba(236, 38, 143, 0.4);
+}
+
+.glow-alma-lg {
+  box-shadow: 0 0 30px rgba(236, 38, 143, 0.5);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(236, 38, 143, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 38, 143, 0.6);
+}
